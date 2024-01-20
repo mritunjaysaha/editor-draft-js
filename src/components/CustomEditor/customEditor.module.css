@@ -6,7 +6,7 @@
     gap: 1rem;
 
     .editor_title_save_div {
-        display: flex;
+        display: flex !important;
         align-items: center;
 
         width: 100%;
