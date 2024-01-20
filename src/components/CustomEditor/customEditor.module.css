@@ -1,7 +1,45 @@
-.editor_container {
-    background: #fafafa;
-    border: 1px solid blue;
+.editor {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 1rem;
 
-    width: 60vw;
-    height: 70vh;
+    .editor_title_save_div {
+        display: flex;
+        align-items: center;
+
+        width: 100%;
+
+        .editor_title {
+            width: 100%;
+            text-align: center;
+        }
+
+        .save_button {
+            border: none;
+            background: #cacaca;
+            border-radius: 0.5rem;
+
+            padding: 0.5rem 1rem;
+
+            font-weight: 700;
+
+            transition: all 0.2s ease-in-out;
+
+            cursor: pointer;
+
+            &:hover {
+                background: #cfcfcf;
+            }
+        }
+    }
+
+    .editor_container {
+        background: #fafafa;
+        border: 1px solid blue;
+
+        width: 60vw;
+        height: 70vh;
+    }
 }

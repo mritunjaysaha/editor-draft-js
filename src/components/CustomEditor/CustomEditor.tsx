@@ -1,4 +1,11 @@
-import { Editor, EditorState, Modifier, RichUtils } from "draft-js";
+import {
+    Editor,
+    EditorState,
+    Modifier,
+    RichUtils,
+    convertFromRaw,
+    convertToRaw,
+} from "draft-js";
 import React from "react";
 import styles from "./customEditor.module.css";
 
@@ -32,9 +39,17 @@ const styleMap = {
 };
 
 export const CustomEditor = () => {
-    const [editorState, setEditorState] = React.useState(() =>
-        EditorState.createEmpty()
-    );
+    const [editorState, setEditorState] = React.useState(() => {
+        const savedContent = localStorage.getItem("editor-content");
+        if (savedContent) {
+            return EditorState.createWithContent(
+                convertFromRaw(JSON.parse(savedContent))
+            );
+        }
+
+        return EditorState.createEmpty();
+    });
+
     const updateEditorState = (
         currentContent: any,
         selection: any,
@@ -79,13 +94,43 @@ export const CustomEditor = () => {
         }
     };
 
+    const handleSaveClick = () => {
+        const content = editorState.getCurrentContent();
+        const rawContent = convertToRaw(content);
+
+        localStorage.setItem("editor-content", JSON.stringify(rawContent));
+
+        alert("Changes Saved");
+    };
+
     return (
-        <div className={styles.editor_container}>
-            <Editor
-                onChange={onEditorStateChange}
-                editorState={editorState}
-                customStyleMap={styleMap}
-            />
+        <div className={styles.editor}>
+            <div className={styles.editor_title_save_div}>
+                <p className={styles.editor_title}>
+                    Demo editor by{" "}
+                    <a
+                        target="_blank"
+                        href="https://mritunjaysaha.netlify.app"
+                        rel="noreferrer"
+                    >
+                        Mritunjay Saha
+                    </a>
+                </p>
+                <button
+                    onClick={handleSaveClick}
+                    className={styles.save_button}
+                >
+                    Save
+                </button>
+            </div>
+
+            <div tabIndex={-1} className={styles.editor_container}>
+                <Editor
+                    onChange={onEditorStateChange}
+                    editorState={editorState}
+                    customStyleMap={styleMap}
+                />
+            </div>
         </div>
     );
 };
