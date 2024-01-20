@@ -41,5 +41,13 @@
 
         width: 60vw;
         height: 70vh;
+
+        @media only screen and (max-width: 800px) {
+            width: 80vw;
+        }
+
+        @media only screen and (max-width: 600px) {
+            width: 90vw;
+        }
     }
 }
