@@ -1,0 +1,7 @@
+.editor_container {
+    background: #fafafa;
+    border: 1px solid blue;
+
+    width: 60vw;
+    height: 70vh;
+}
