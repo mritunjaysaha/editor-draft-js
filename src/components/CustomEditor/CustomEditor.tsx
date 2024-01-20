@@ -21,6 +21,7 @@ const CUSTOM_STYLES: Record<CustomStyleKeys, CustomStyleKeys> = {
 const styleMap = {
     RED: {
         color: "red",
+        fontWeight: 400,
     },
     BOLD: {
         color: "black",
