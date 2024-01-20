@@ -1,4 +1,4 @@
-import { ContentState, Editor, EditorState, RichUtils } from "draft-js";
+import { Editor, EditorState, Modifier, RichUtils } from "draft-js";
 import React from "react";
 import styles from "./customEditor.module.css";
 
@@ -12,22 +12,22 @@ const CUSTOM_STYLES: Record<CustomStyleKeys, CustomStyleKeys> = {
 };
 
 const styleMap = {
-    HEADING: {
-        fontSize: 32,
-        fontWeight: 700,
-        // background: "pink",
-    },
-    BOLD: {
-        fontWeight: 700,
-        // background: "red",
-    },
     RED: {
         color: "red",
-        // background: "blue",
+    },
+    BOLD: {
+        color: "black",
+        fontSize: 16,
+        fontWeight: 700,
+    },
+    HEADING: {
+        color: "black",
+        fontSize: 32,
+        fontWeight: 700,
     },
     UNDERLINE: {
+        color: "black",
         textDecoration: "underline",
-        // background: "yellow",
     },
 };
 
@@ -36,72 +36,54 @@ export const CustomEditor = () => {
         EditorState.createEmpty()
     );
     const updateEditorState = (
-        text: string,
-        replaceKey: string,
+        currentContent: any,
+        selection: any,
         styleKey: CustomStyleKeys
     ) => {
-        const newText = text.replace(replaceKey, "");
-
-        const newContentState = ContentState.createFromText(newText);
-
-        const newEditorState = EditorState.createWithContent(newContentState);
-
-        const updatedEditorState = RichUtils.toggleInlineStyle(
-            newEditorState,
-            styleKey
+        const newContentState = Modifier.replaceText(
+            currentContent,
+            selection.merge({ anchorOffset: 0, focusOffset: 3 }),
+            ""
         );
 
-        setEditorState(updatedEditorState);
+        const newEditorState = EditorState.push(
+            editorState,
+            newContentState,
+            "remove-range"
+        );
+
+        setEditorState(RichUtils.toggleInlineStyle(newEditorState, styleKey));
     };
 
     const onEditorStateChange = (editorState: EditorState) => {
         setEditorState(editorState);
 
         const currentContent = editorState.getCurrentContent();
-        const text = currentContent.getPlainText();
+        const selection = editorState.getSelection();
+        const block = currentContent.getBlockForKey(selection.getStartKey());
+        const text = block.getText();
 
-        if (text.includes("*** ")) {
-            updateEditorState(text, "*** ", CUSTOM_STYLES.UNDERLINE);
-        } else if (text.includes("** ")) {
-            console.log("red");
+        if (text.startsWith("# ")) {
+            updateEditorState(currentContent, selection, CUSTOM_STYLES.HEADING);
         }
-
-        // const blocksHTML = draftToHtml(
-        //     convertToRaw(editorState.getCurrentContent())
-        // );
-
-        // const parser = new DOMParser();
-        // const doc = parser.parseFromString(blocksHTML, "text/html");
-
-        // // @ts-ignore
-        // const bodyContents = doc.childNodes[0].childNodes[1].children;
-
-        // // @ts-ignore
-        // Array.from(bodyContents).forEach((element: HTMLElement) => {
-        //     const { innerHTML } = element;
-
-        //     if (innerHTML.includes("***&nbsp;")) {
-
-        //         const updatedEditorState = RichUtils.toggleInlineStyle(
-        //             editorState,
-        //             "HIGHLIGHT"
-        //         );
-
-        //         setEditorState(updatedEditorState);
-        //     } else if (innerHTML.includes("**&nbsp;")) {
-        //         console.log({ innerHTML }, "red color");
-        //     }
-        //     if (innerHTML.includes("#&nbsp;")) {
-        //         console.log({ innerHTML }, "heading");
-        //     }
-        // });
+        if (text.startsWith("*** ")) {
+            updateEditorState(
+                currentContent,
+                selection,
+                CUSTOM_STYLES.UNDERLINE
+            );
+        } else if (text.startsWith("** ")) {
+            updateEditorState(currentContent, selection, CUSTOM_STYLES.RED);
+        } else if (text.startsWith("* ")) {
+            updateEditorState(currentContent, selection, CUSTOM_STYLES.BOLD);
+        }
     };
 
     return (
         <div className={styles.editor_container}>
             <Editor
-                editorState={editorState}
                 onChange={onEditorStateChange}
+                editorState={editorState}
                 customStyleMap={styleMap}
             />
         </div>
